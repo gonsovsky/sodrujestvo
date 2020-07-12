@@ -1,0 +1,31 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "tsc": "tsc",
+    "start": "node dist/app.js",
+    "dev": "ts-node-dev --respawn --transpileOnly src/app.ts",
+    "prod": "tsc && node dist/app.js"
+  },
+  "dependencies": {
+    "@types/mongoose": "^5.7.31",
+    "body-parser": "^1.18.0",
+    "express": "3.2.6",
+    "hjs": "0.0.4",
+    "less-middleware": "0.1.12",
+    "mongoose": "^5.9.23",
+    "nconf": "^0.10.0",
+    "node-fetch": "^2.6.0",
+    "ts-node-dev": "^1.0.0-pre.51",
+    "typescript": "^3.9.6",
+    "underscore": "1.4.4"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.4",
+    "@babel/core": "^7.10.4",
+    "@babel/node": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "@types/node": "^14.0.22"
+  }
+}
