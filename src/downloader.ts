@@ -1,14 +1,15 @@
 import {UserList} from "./model/userList";
 import {IUser} from "./model/user";
+import {forEach} from "async";
 const fetch = require("node-fetch");
+const Async = require("async");
+
+const maxThreads: number=2;
 
 export class Downloader{
     private contentUrl: string
     private frequency: number
     private callback:  (user: IUser) => void
-
-    private currentPage: number=0
-    private totalPages: number=0
 
     constructor(contentUrl: string, frequency: number, userDownloaded: (user: IUser) => void) {
         this.contentUrl = contentUrl
@@ -16,29 +17,49 @@ export class Downloader{
         this.callback = userDownloaded
     }
 
-    get urlPage(): string {
-        return this.contentUrl + this.currentPage.toString()
-    }
-
     async serve() {
         while (true) {
-            this.currentPage = 1;
-            this.totalPages = 0;
-            this.servePage()
+            let totalPages = await this.servePage(this, 1);
+            let pages = this.sequence(2, totalPages)
+            await this.servePages(pages)
+            console.log(`downloading compelete. wait for ${this.frequency} seconds`);
             await this.sleep(this.frequency)
         }
     }
 
-    async servePage(){
-        var cx = new UserList(await this.http<UserList>(this.urlPage));
-        for (let entry of cx.data)
-            this.callback(entry)
-        if (this.totalPages==0)
-            this.totalPages=cx.total_pages;
-        if (this.currentPage < this.totalPages){
-            this.currentPage += +1;
-            this.servePage()
+    *sequence(from: number, max: number) {
+        var i=2;
+        while (i <= max){
+            yield  i
+            i++;
         }
+    }
+    
+    async servePages(pages: Iterable<number>) {
+        var self = this;
+        return new Promise((resolve, reject) => {
+            Async.eachLimit(pages, maxThreads,  (page:number, callback: any) => {
+                 self.servePage(self, page).then(()=>     callback())
+            }, (error: any) => {
+                if (error){
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            })
+        });
+    }
+
+    async servePage(self: Downloader, page: number){
+        console.log(`downloading page: ${page}`);
+        var ul = new UserList(await self.http<UserList>(self.urlPage(page)));
+        for (let entry of ul.data)
+            self.callback(entry)
+        return ul.total_pages;
+    }
+
+    urlPage(page: number): string {
+        return this.contentUrl + page.toString()
     }
 
     async http<T>(

@@ -9,7 +9,9 @@
     "prod": "tsc && node dist/app.js"
   },
   "dependencies": {
+    "@types/async": "^3.2.3",
     "@types/mongoose": "^5.7.31",
+    "async": "^3.2.0",
     "body-parser": "^1.18.0",
     "express": "3.2.6",
     "hjs": "0.0.4",

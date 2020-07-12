@@ -8,7 +8,7 @@ let storage = new Storage("mongodb://localhost:27017/")
 new RestApi(5000, storage)
     .serve()
 
-new Downloader("https://reqres.in/api/users?page=", 15, UserDownloaded)
+new Downloader("https://reqres.in/api/users?per_page=2&page=", 15, UserDownloaded)
     .serve()
 
 async function UserDownloaded(user: IUser) {
